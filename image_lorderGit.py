@@ -1,6 +1,7 @@
 import csv
 import requests  # http://docs.python-requests.org/en/master/
 import shutil # to save it locally
+from bs4 import BeautifulSoup
 
 
 
@@ -11,17 +12,12 @@ import time
 def download_image(name ,image_url):
     try:
         request =   requests.get(image_url, timeout=5)
-        print(request)
-        # Check if the image was retrieved successfully
-        if request.status_code == 200:
-            # Set decode_content value to True, otherwise the downloaded image file's size will be zero.
-            request.raw.decode_content = True
-
-            file_location = f'ASI_Images/{name}.jpg'
-            print(file_location, request.status_code)
-            with open(file_location, 'wb') as f:
-                shutil.copyfileobj(request.raw, f)
-                f.close()
+        file_location = f'ASI_Images/{name}.jpg'
+        print(file_location, request.status_code)
+        if request.status_code:
+            fp = open(file_location, 'wb')
+            fp.write(request.content)
+            fp.close()
     except:
         fail_List=[]
         fail_List.append((name,image_url))
@@ -42,6 +38,7 @@ for item in csv_block:
     if item[6] =='':
         continue
     product_URL = item[6]
+    print(product_URL)
     #print(product_URL)
     download_image(item_number,product_URL)
     print(count)
